@@ -25,13 +25,13 @@ public class AlarmReminderDbHelper extends SQLiteOpenHelper {
         // Create a String that contains the SQL statement to create the reminder table
         String SQL_CREATE_ALARM_TABLE =  "CREATE TABLE " + AlarmReminderContract.AlarmReminderEntry.TABLE_NAME + " ("
                 + AlarmReminderContract.AlarmReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_TITLE + " TEXT NOT NULL, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_DATE + " TEXT NOT NULL, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_TIME + " TEXT NOT NULL, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_REPEAT + " TEXT NOT NULL, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_REPEAT_NO + " TEXT NOT NULL, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_REPEAT_TYPE + " TEXT NOT NULL, "
-                + AlarmReminderContract.AlarmReminderEntry.KEY_ACTIVE + " TEXT NOT NULL " + " );";
+                + AlarmReminderContract.AlarmReminderEntry.KEY_TITLE + " TEXT, "
+                + AlarmReminderContract.AlarmReminderEntry.KEY_DATE + " TEXT, "
+                + AlarmReminderContract.AlarmReminderEntry.KEY_TIME + " TEXT, "
+                + AlarmReminderContract.AlarmReminderEntry.KEY_REPEAT + " TEXT, "
+                + AlarmReminderContract.AlarmReminderEntry.KEY_REPEAT_NO + " TEXT, "
+                + AlarmReminderContract.AlarmReminderEntry.KEY_REPEAT_TYPE + " TEXT, "
+                + AlarmReminderContract.AlarmReminderEntry.KEY_ACTIVE + " TEXT " + " );";
 
         // Execute the SQL statement
         sqLiteDatabase.execSQL(SQL_CREATE_ALARM_TABLE);

@@ -1,20 +1,30 @@
 package com.delaroystudios.alarmreminder;
 
-import android.app.LoaderManager;
+
 import android.app.ProgressDialog;
 import android.content.ContentUris;
-import android.content.CursorLoader;
+import android.content.ContentValues;
+
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
+
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.delaroystudios.alarmreminder.data.AlarmReminderContract;
 import com.delaroystudios.alarmreminder.data.AlarmReminderDbHelper;
@@ -27,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     AlarmReminderDbHelper alarmReminderDbHelper = new AlarmReminderDbHelper(this);
     ListView reminderListView;
     ProgressDialog prgDialog;
+    TextView reminderText;
+
+    private String alarmTitle = "";
 
     private static final int VEHICLE_LOADER = 0;
 
@@ -41,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
         reminderListView = (ListView) findViewById(R.id.list);
+        reminderText = (TextView) findViewById(R.id.reminderText);
+
+
         View emptyView = findViewById(R.id.empty_view);
         reminderListView.setEmptyView(emptyView);
 
@@ -69,12 +85,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAddReminderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AddReminderActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(v.getContext(), AddReminderActivity.class);
+                //startActivity(intent);
+                addReminderTitle();
             }
         });
 
-        getLoaderManager().initLoader(VEHICLE_LOADER, null, this);
+        getSupportLoaderManager().initLoader(VEHICLE_LOADER, null, this);
 
 
     }
@@ -105,6 +122,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mCursorAdapter.swapCursor(cursor);
+        if (cursor.getCount() > 0){
+            reminderText.setVisibility(View.VISIBLE);
+        }else{
+            reminderText.setVisibility(View.INVISIBLE);
+        }
 
     }
 
@@ -112,5 +134,53 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursorAdapter.swapCursor(null);
 
+    }
+
+    public void addReminderTitle(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Set Reminder Title");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (input.getText().toString().isEmpty()){
+                    return;
+                }
+
+                alarmTitle = input.getText().toString();
+                ContentValues values = new ContentValues();
+
+                values.put(AlarmReminderContract.AlarmReminderEntry.KEY_TITLE, alarmTitle);
+
+                Uri newUri = getContentResolver().insert(AlarmReminderContract.AlarmReminderEntry.CONTENT_URI, values);
+
+                restartLoader();
+
+
+                if (newUri == null) {
+                    Toast.makeText(getApplicationContext(), "Setting Reminder Title failed", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Title set successfully", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    public void restartLoader(){
+        getSupportLoaderManager().restartLoader(VEHICLE_LOADER, null, this);
     }
 }
