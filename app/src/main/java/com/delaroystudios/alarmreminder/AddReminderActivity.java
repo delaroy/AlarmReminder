@@ -503,6 +503,8 @@ public class AddReminderActivity extends AppCompatActivity implements
             // content URI already identifies the reminder that we want.
             int rowsDeleted = getContentResolver().delete(mCurrentReminderUri, null, null);
 
+            new AlarmScheduler().cancelAlarm(getApplicationContext(), mCurrentReminderUri);
+
             // Show a toast message depending on whether or not the delete was successful.
             if (rowsDeleted == 0) {
                 // If no rows were deleted, then there was an error with the delete.
